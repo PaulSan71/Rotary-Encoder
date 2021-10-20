@@ -1,13 +1,13 @@
 #include <Arduino.h>
 
 // Used for generating interrupts using CLK signal
-const int PinA = 2;
+const int CLK = 2;
 
 // Used for reading DT signal
-const int PinB = 3;
+const int DT = 3;
 
 // Used for the push button switch
-const int PinSW = 8;
+const int PUSHBUTTON = 8;
 
 // Keep track of last rotary value
 int lastCount = 50;
@@ -24,7 +24,7 @@ void isr ()  {
 
   // If interrupts come faster than 5ms, assume it's a bounce and ignore
   if (interruptTime - lastInterruptTime > 5) {
-    if (digitalRead(PinB) == LOW)
+    if (digitalRead(DT) == LOW)
     {
       virtualPosition-- ; // Could be -5 or -10
     }
@@ -49,14 +49,14 @@ void setup() {
   Serial.begin(115200);
 
   // Rotary pulses are INPUTs
-  pinMode(PinA, INPUT);
-  pinMode(PinB, INPUT);
+  pinMode(CLK, INPUT);
+  pinMode(DT, INPUT);
 
   // Switch is floating so use the in-built PULLUP so we don't need a resistor
-  pinMode(PinSW, INPUT_PULLUP);
+  pinMode(PUSHBUTTON, INPUT_PULLUP);
 
   // Attach the routine to service the interrupts
-  attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
+  attachInterrupt(digitalPinToInterrupt(CLK), isr, LOW);
 
   // Ready to go!
   Serial.println("Start");
@@ -68,9 +68,9 @@ void setup() {
 void loop() {
 
   // Is someone pressing the rotary switch?
-  if ((!digitalRead(PinSW))) {
+  if ((!digitalRead(PUSHBUTTON))) {
     virtualPosition = 50;
-    while (!digitalRead(PinSW))
+    while (!digitalRead(PUSHBUTTON))
       delay(10);
     Serial.println("Reset");
   }
